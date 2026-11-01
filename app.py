@@ -265,7 +265,6 @@ with st.sidebar:
  st.caption("STRUCTURAL ENGINEERING STUDIO")
  page=st.radio("Explorer",["Vue générale","Analyse des poutres","Pré-dimensionnement semelles","Optimisation des sections","Probabilités & fiabilité","Explorateur de données","Combinaisons de charges","Propriétés des sections","Comprendre & limites"])
  st.divider()
- st.caption("Calculs mécaniques pédagogiques · Pas de certification BAEL/EC2")
 st.markdown('<div class="hero"><h1>DIMENSIA <span style="color:#f6b75c">/ Studio</span></h1><p>Analyser. Pré-dimensionner. Comparer. Comprendre les structures.</p></div>',unsafe_allow_html=True)
 st.write("")
 if "beam" not in st.session_state:
@@ -293,7 +292,6 @@ def beam_form():
 beam=Beam(**st.session_state.beam)
 if page=="Vue générale":
  st.subheader("Tableau de bord technique")
- st.info("Version 1 : modèles de poutres d'Euler-Bernoulli et semelles centrées. Les règles complètes de ferraillage BAEL 91/99 et Eurocode 2 ne sont pas encore implémentées.")
  try:
   r=analyze(beam)
   a,b,c,d=st.columns(4)
@@ -303,7 +301,6 @@ if page=="Vue générale":
   with d:metric("Flèche maximale",f"{r['deflection_mm']:.2f} mm")
   plot_line(r["x"],r["M"],"Diagramme du moment fléchissant","M (kN·m)")
  except ValueError as e:st.error(str(e))
- st.caption("Les charges ne sont pas combinées à l'ELU. Aucun calcul de ferraillage normatif n'est fourni.")
 elif page=="Analyse des poutres":
  st.header("📐 Analyse mécanique des poutres")
  beam=beam_form()
@@ -337,7 +334,6 @@ elif page=="Pré-dimensionnement semelles":
   cols=st.columns(4)
   for col,title,val in zip(cols,["Surface minimale","Largeur B","Longueur L","Pression calculée"],[f"{r['area_m2']:.2f} m²",f"{r['width_m']:.2f} m",f"{r['length_m']:.2f} m",f"{r['bearing_kpa']:.1f} kPa"]):
    with col:metric(title,val)
-  st.warning("Résultat indicatif : faire vérifier la portance géotechnique, les tassements, le poinçonnement, la flexion et les armatures avant toute utilisation.")
   st.download_button("Note de calcul PDF",pdf("Semelle — pression moyenne",{"N (kN)":N,"q adm (kPa)":qa,"L/B":ratio,"epaisseur (m)":h},r,"Vérification très simplifiée sous charge centrée. Non conforme à une procédure normative complète."),"DIMENSIA_semelle.pdf","application/pdf")
  except ValueError as ex:st.error(str(ex))
 elif page=="Optimisation des sections":
@@ -357,7 +353,6 @@ elif page=="Optimisation des sections":
   st.dataframe(d,use_container_width=True,hide_index=True)
   st.plotly_chart(px.scatter(d,x="volume_m3",y="fleche_mm",color="admissible_selon_criteres_saisis",hover_data=["largeur_cm","hauteur_cm"],title="Volume et flèche des sections candidates"),use_container_width=True)
   st.download_button("Exporter comparaison CSV",d.to_csv(index=False).encode("utf-8-sig"),"dimensia_sections.csv","text/csv")
- st.info("Important : le modèle n'effectue aucune vérification normative en flexion, cisaillement, ancrage ou fissuration. Les sections sont des candidats à étudier, pas des sections certifiées.")
 elif page=="Probabilités & fiabilité":
  st.header("🎲 Simulation probabiliste des sollicitations")
  st.caption("Distribution lognormale positive sur la charge répartie. La probabilité calculée est un dépassement de seuil choisi, pas une probabilité de ruine normative.")
@@ -416,7 +411,7 @@ elif page=="Explorateur de données":
   except Exception as exc:st.error(f"Impossible d'analyser le fichier : {exc}")
 elif page=="Combinaisons de charges":
  st.header("⚖️ Combinaisons paramétriques de charges")
- st.warning("Les coefficients sont choisis par l'utilisateur. Aucun préréglage réglementaire BAEL/Eurocode 2 n'est appliqué.")
+ st.caption("Coefficients renseignés par l’utilisateur ; voir « Comprendre & limites » pour les hypothèses.")
  c1,c2=st.columns(2)
  with c1:
   G=st.number_input("Charge permanente G (kN/m)",0.,10000.,10.)
